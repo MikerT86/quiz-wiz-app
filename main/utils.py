@@ -18,6 +18,6 @@ def send_results_email(results, name, email, quiz):
     send_mail(
         subject,
         message,
-        'mternyuk@gmail.com',  # Replace with your email address
+        'example@gmail.com',  # Replace with your email address
         [email],  # Recipient email
     )
