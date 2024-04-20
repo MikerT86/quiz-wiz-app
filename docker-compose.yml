@@ -1,0 +1,7 @@
+version: '3'
+ 
+services:
+  quizz-ai:
+    build: . # Use Dockerfile in current directory
+    ports:
+      - "8000:8000"  # Map container port 8000 to host port 800

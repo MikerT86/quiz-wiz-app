@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+
+{% block title %}Run Quiz{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <form method="post" id='runQuizForm'>
+        {% csrf_token %}
+        <div class="d-flex justify-content-between">
+            <div id='quiz_info'>
+                <h1>{{quiz.topic}}</h1>
+
+                <h3>{{quiz.description}}</h3>
+                <p>Number of questions: {{quiz.number_questions}} | Difficulty: 
+                    {% if quiz.level == "Easy" %}
+                    <span class="badge text-bg-success">{{quiz.level}}</span>
+                    {% elif quiz.level == "Medium" %}
+                    <span class="badge text-bg-warning">{{quiz.level}}</span>
+                    {% else %}
+                    <span class="badge text-bg-danger">{{quiz.level}}</span>
+                    {% endif %}
+                </p>
+            </div>
+            <div id="timer" class="timer"><i class="bi bi-clock"></i> {{time_limit}}</div>
+        </div>
+        <div class="form-group mt-2">
+            <div id="carouselQuestions" class="carousel slide mt-3">
+                <div class="d-flex justify-content-between">
+                    <div class="carousel-controls">
+                        <button class="btn btn-outline-secondary btn-sm" type="button" data-bs-target="#carouselQuestions" data-bs-slide="prev">
+                            Previous
+                        </button>
+                        <button class="btn btn-outline-secondary btn-sm" type="button" data-bs-target="#carouselQuestions" data-bs-slide="next" id="nextBtn">
+                            Next
+                        </button>
+                        <button type="submit" class="btn btn-success btn-sm">Submit</button>
+                    </div>
+                    {% comment %} <div id="timer" class="timer mt-2" style="padding-right: 5px"><i class="bi bi-clock"></i> {{time_limit}}</div> {% endcomment %}
+                    <span></span>
+                </div>
+                <div class="carousel-inner mt-3">
+                    {% for question in quiz.questions.all %}
+                        <div class="carousel-item {% if forloop.first %} active {% endif %}">
+                            <div class="card mb-3" style='font-size: 16px; font-family: sans-serif; border-radius: 10px'>
+                                <div class="card-header" style="background-color: rgb(220, 220, 220); border-radius: 0px; font-size: 14px">
+                                    <strong>{{forloop.counter}}. {{ question.text }}</strong>
+                                </div>
+                                <div class="card-body">
+                                    {% for option in question.options.all %}
+                                    <div class="form-check mt-2">
+                                        <input class="form-check-input" type="radio" name="question_{{question.id}}" id="question_{{question.id}}" value="{{forloop.counter}}">
+                                        <label class="form-check-label" for="question_{{question.id}}" id="q_{{question.id}}_op_{{option.id}}">
+                                            {{ option }}
+                                        </label>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+    $(document).ready(function () {
+
+        {% comment %} const carousel = document.getElementById("carouselQuestions");
+        const nextButton = carousel.querySelector("#nextBtn");
+    
+        carousel.addEventListener("slide.bs.carousel", function (event) {
+            // Check if the slide index is the last one
+            if (event.to === {{quiz.number_questions}} - 1) {
+                nextButton.disabled = true;
+                nextButton.classList.add("disabled"); // Optional: Add a visual cue for disabled state
+            }
+        }); {% endcomment %}
+    });
+
+    const timerElement = document.getElementById('timer');
+    const testForm = document.getElementById('runQuizForm');
+    let timeLeft = {{time_limit}};
+    let intervalId;
+
+    function startTimer() {
+        intervalId = setInterval(() => {
+            timeLeft--;
+            timerElement.textContent = formatTime(timeLeft);
+        
+            if (timeLeft <= 30) {
+                timerElement.classList.add('red-timer');
+            }
+        
+            if (timeLeft === 0) {
+                clearInterval(intervalId);
+                testForm.submit(); // Submit the test form automatically
+            }
+        }, 1000);
+    }
+      
+    function formatTime(seconds) {
+        const minutes = Math.floor(seconds / 60);
+        const remainingSeconds = seconds % 60;
+        return `<i class="bi bi-clock"></i> ${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+    }
+
+    function startTimer() {
+        intervalId = setInterval(() => {
+        timeLeft--;
+        timerElement.innerHTML = formatTime(timeLeft);
+    
+        if (timeLeft <= 30) {
+            timerElement.classList.add('red-timer');
+        }
+    
+        if (timeLeft === 0) {
+            clearInterval(intervalId);
+            submitTest(); // Submit the test form automatically
+        }
+        }, 1000);
+    }
+
+    function submitTest() {
+        testForm.submit();
+        alert("Test submitted! You can access and process the selected answers here.");
+    }
+
+    // Start the timer
+    timerElement.innerHTML = formatTime(timeLeft);
+    startTimer();
+
+    // Submit button functionality (optional)
+    testForm.addEventListener('submit', function(event) {
+        event.preventDefault();
+        let valid_json = confirm('Are you sure you want to submit answers?');
+        
+        if (valid_json) {
+            submitTest();
+        }
+    });
+
+</script>
+{% endblock %}

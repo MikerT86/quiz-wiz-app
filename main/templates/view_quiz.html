@@ -1,0 +1,24 @@
+{% extends 'base.html' %} {% block title %}Update Quiz{% endblock %}
+{% block content %}
+
+<div class="container mt-5">
+  <h1>{{quiz.topic}}</h1>
+  <h3>{{quiz.description}}</h3>
+  <p>Number of questions: {{quiz.number_questions}} | Difficulty: 
+      {% if quiz.level == "Easy" %}
+      <span class="badge text-bg-success">{{quiz.level}}</span>
+      {% elif quiz.level == "Medium" %}
+      <span class="badge text-bg-warning">{{quiz.level}}</span>
+      {% else %}
+      <span class="badge text-bg-danger">{{quiz.level}}</span>
+      {% endif %}
+  </p>
+  <br/>
+  <p>To pass the test you should answer correctly at least <strong>80%</strong> of the questions. You will have <strong><i class="bi bi-clock"></i> {{time_limit}}</strong> to answer all of them.</p>
+  <div class="form-group mt-2">
+    <a href="{% url 'run_quiz' quiz.pk %}" class="btn btn-outline-success">Start</a>
+    <button onclick="window.history.back()" class="btn btn-secondary">Close</button>
+  </div>
+</div>
+
+{% endblock %}

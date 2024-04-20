@@ -1,0 +1,201 @@
+{% extends 'base.html' %} {% block title %}Create a Quiz{% endblock %}
+
+{% block content %}
+<div class="container mt-3" style="width: 60%;">
+
+  <form method="post" id="quizForm">
+    {% csrf_token %}
+
+    <div class="form-group mt-3">
+      {{form.topic}}
+    </div>
+    
+    <div class="form-group mt-2">
+      {{form.description}}
+    </div>
+
+    <div class="form-group mt-2 d-flex justify-content-between">
+      <div class="form-group">
+        {% for choice in form.level %}  
+            <input class="btn-check" type="radio" name="level" id="{{ choice.id_for_label }}" value="{{ choice.choice_label }}" autocomplete="off" {% if form.level.value == choice.choice_label %} checked {% endif %}>
+            {% if choice.choice_label == 'Easy' %}
+            <label class="btn btn-outline-success btn-sm" style="font-weight: bold" for="{{ choice.id_for_label }}">{{ choice.choice_label }}</label>
+            {% elif choice.choice_label == 'Medium' %}
+            <label class="btn btn-outline-warning btn-sm" style="font-weight: bold" for="{{ choice.id_for_label  }}">{{ choice.choice_label }}</label>
+            {% else %}
+            <label class="btn btn-outline-danger btn-sm" style="font-weight: bold" for="{{ choice.id_for_label  }}">{{ choice.choice_label }}</label>
+            {% endif %}
+        {% endfor %}
+      </div>  
+      <div class="form-group ms-3 d-flex align-items-center">
+        <div class="form-check form-switch" style="margin-top: 1px" {% if not user.extendeduser.openai_key %} hidden {% endif %}>
+          <input class="form-check-input" type="checkbox" role="switch" id="useAI">
+          <label class="form-check-label fw-bold" for="useAI" style="margin-right: 5px">Use AI</label>
+        </div>
+        <button type="button" class="btn btn-primary btn-sm" style="font-weight: bold; margin-right: 4px" id="generate">Generate Questions <i class="bi bi-magic"></i></button>
+        <button type="button" class="btn btn-primary btn-sm" style="font-weight: bold" id="get_prompt">Prompt <i class="bi bi-chat"></i></button>
+      </div>
+    </div>
+    <div id="response-message"></div>
+    <ul class="nav nav-tabs mt-3" id="myTab">
+      <li class="nav-item">
+        <button class="nav-link active"id="questions-tab" data-bs-toggle="tab" data-bs-target="#questions_tab" type="button" role="tab" aria-controls="questions-tab-pane" aria-selected="true">Questions</button>
+      </li>
+      <li class="nav-item">
+        <button class="nav-link" id="json-tab" data-bs-toggle="tab" data-bs-target="#json" type="button" role="tab" aria-controls="json-tab-pane" aria-selected="false">JSON</button>
+      </li>        
+    </ul>
+
+    <div class="tab-content" id="myTabContent">
+      <div class="tab-pane show active" id="questions_tab" role="tabpanel" aria-labelledby="questions-tab" tabindex='0'>
+        <div class="accordion" id="accordionQuestions">
+          {% if quiz is not None %}
+            {% for question in quiz.questions.all %}
+            <div class="accordion-item">
+              <h5 class="accordion-header">
+                <button class="accordion-button collapsed" style="height: 50px;" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{forloop.counter}}" aria-expanded="true" aria-controls="collapse{{forloop.counter}}">
+                  <strong style="font-size: 14px;">{{forloop.counter}}. {{ question.text }}</strong>
+                </button>
+              </h5>
+              <div id="collapse{{forloop.counter}}" class="accordion-collapse collapse" data-bs-parent="#accordionQuestions">
+                <div class="accordion-body">
+                  <ul>
+                    {% for option in question.options.all %}
+                      {% if forloop.counter == question.answer %}
+                      <li class="text-success">{{ option.text }}</li>  
+                      {% else %}
+                      <li>{{ option.text }}</li>
+                      {% endif %}
+                    {% endfor %}
+                  </ul>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          {% else %}
+            <p class="text-muted">No questions added yet</p>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="tab-pane" id="json" role="tabpanel" aria-labelledby="json-tab" tabindex='1'>
+        {{ form.questions_as_json | safe }}
+      </div>  
+    </div>
+
+    <div class="form-group mt-3">
+      <button type="submit" class="btn btn-success btn-sm" id="saveQuiz">Save</button>
+      <a href="/" class="btn btn-secondary btn-sm">Close</a>
+      {% if quiz is not None %}
+        <a href="{% url 'view_quiz' quiz.pk %}" class="btn btn-outline-success btn-sm" style="font-weight: bold; float: right" id="runQuiz" onclick="startQuiz()">Run <i class="bi bi-play"></i></a>
+      {% endif %}
+    </div>
+    
+  </form>
+</div>
+
+<script>
+function sendRequestToServer(url, method, formData) {
+  $.ajax({
+      url: url,
+      type: method,
+      data: formData,
+      success: function(response) {
+        copyToClipboard(response);
+        console.log("Prompt: \n" + response);
+      },
+      error: function(xhr, status, error) {
+        console.error('Error:', error);
+      }
+  });
+}
+
+function getQuizParams() {
+  const numQuestions = parseInt(prompt("Enter number of questions (<= 10):"));
+  if (!Number.isInteger(numQuestions) || numQuestions <= 0 || numQuestions > 10) {
+      alert("You entered an invalid number of questions.");
+      return;
+  }
+
+  return {
+      'csrfmiddlewaretoken': '{{ csrf_token }}',
+      'topic': document.getElementById('topic').value,
+      'description': document.getElementById('description').value,
+      'level': document.querySelector('input[name="level"]:checked').value,
+      'numQuestions': numQuestions
+  };
+}
+
+// Add event listener to the form
+$('#get_prompt').click(function() {
+
+  if (document.getElementById('topic').value == "") {
+    alert("Please enter a topic.");
+    return;
+  }
+
+  if (document.getElementById('description').value == "") {
+    alert("Please enter a description.");
+    return;
+  }
+
+  sendRequestToServer('/api/prompt/', 'POST', getQuizParams()); // Call the function to get the prompt text;
+  alert('Prompt copied to clipboard! You can now use it with your favourite chatbot (ChatGPT, Gemini ... ). \nThen past the response into JSON text area. \nHave fun!');
+});
+</script>
+
+<script>
+const form = document.getElementById('quizForm');
+
+form.addEventListener('submit', (event) => {
+    const json_questions = document.getElementById('questions').value;
+    let valid_json = true;
+    
+    console.log("JSON: \n" + json_questions);
+    console.log("Type: " + typeof (json_questions));
+
+    // Check if JSON is valid
+    try {
+        json_data = JSON.parse(json_questions);
+    }
+    catch (e) {
+        alert("Invalid JSON format");
+        event.preventDefault();
+        return
+    }
+
+    console.log(json_data);
+
+    if (!("data" in json_data)) {
+        alert("The key 'data' is missing in the JSON. Invalid JSON format");
+        event.preventDefault()
+    } else {
+      json_data["data"].forEach(function(question) {
+        if (!("text" in question)) {
+            alert("The key 'text' is missing in the JSON. Invalid JSON format");
+            event.preventDefault()
+        }
+  
+        if (!("options" in question)) {
+            alert("The key 'options' is missing in the JSON. Invalid JSON format");
+            event.preventDefault()
+        } else if (question["options"].length < 2)
+        {
+            alert("The number of options should be at least 2. Invalid JSON format");
+            event.preventDefault()
+        }
+  
+        if (!("answer" in question)) {
+            alert("The key 'answer' is missing in the JSON. Invalid JSON format");
+            event.preventDefault()
+        } else if (question["answer"] < 1 || question["answer"] > question["options"].length)
+        {
+            alert("The 'answer' key should be a number between 1 and " + question["options"].length + ". Invalid JSON format");
+            event.preventDefault()
+        }
+      });
+    }
+
+});
+</script>
+{% endblock %}

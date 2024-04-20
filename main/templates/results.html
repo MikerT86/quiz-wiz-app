@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}Results{% endblock %}
+
+{% block content %}
+<div class="container justify-content-center mt-5">
+    <h1>{{results.quiz.topic}}</h1>
+    <h3>{{results.quiz.description}}</h3>
+    <p>Number of questions: {{results.total_questions}} | Difficulty: 
+        {% if results.quiz.level == "Easy" %}
+        <span class="badge text-bg-success">{{results.quiz.level}}</span>
+        {% elif results.quiz.level == "Medium" %}
+        <span class="badge text-bg-warning">{{results.quiz.level}}</span>
+        {% else %}
+        <span class="badge text-bg-danger">{{results.quiz.level}}</span>
+        {% endif %}
+    </p>
+    <p>Result: {{percent_correct}}% |
+    {% if results.passed %}
+    Passed: <i class="bi bi-check-circle-fill text-success"></i>
+    {% else %}
+    Passed: <i class="bi bi-x-circle-fill text-danger"></i>
+    {% endif %}
+    </p>
+    <div class="accordion mt-3" id="details" class="mt-3">
+        {% for question in results.details %}
+        <div class="accordion-item">
+            <h5 class="accordion-header">
+            <button class="accordion-button collapsed" style="height: 50px;" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_{{forloop.counter}}" aria-expanded="true" aria-controls="collapse_{{forloop.counter}}">
+                <strong style="font-size: 14px">{{forloop.counter}}. {{question.text}} 
+                    {% if question.answer == question.correct_answer %} 
+                    <i class="bi bi-check-circle-fill text-success"></i>
+                    {% else %} 
+                    <i class="bi bi-x-circle-fill text-danger"></i>
+                    {% endif %}
+                </strong>
+            </h5>
+            <div id="collapse_{{forloop.counter}}" class="accordion-collapse collapse" data-bs-parent="#details">
+                <div class="accordion-body">
+                    <ul>
+                    {% for option in question.options %}
+                        {% if forloop.counter == question.answer %} 
+                            {% if forloop.counter == question.correct_answer %}
+                                <li class="text-success">{{ option }}</li>
+                            {% else %}
+                                <li class="text-danger">{{ option }}</li>
+                            {% endif %}
+                        {% else %}
+                            {% if forloop.counter == question.correct_answer %}
+                                <li class="text-success">{{ option }}</li>
+                            {% else %}
+                                <li>{{ option }}</li>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <br/>
+    <a href="{% url 'home' %}" class="btn btn-success btn-sm" href="{% url 'home' %}">Got It!</a>
+    <a href='{% url 'run_quiz' results.quiz.pk %}' class="btn btn-secondary btn-sm">Try again</a>
+    
+</div>
+{% endblock %}

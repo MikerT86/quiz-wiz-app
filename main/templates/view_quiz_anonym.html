@@ -1,0 +1,53 @@
+{% extends 'base.html' %} {% block title %}Quiz{% endblock %}
+{% block content %}
+
+<div class="container mt-5">
+  <h1>{{quiz.topic}}</h1>
+  <h3>{{quiz.description}}</h3>
+  <p>Number of questions: {{quiz.number_questions}} | Difficulty: 
+      {% if quiz.level == "Easy" %}
+      <span class="badge text-bg-success">{{quiz.level}}</span>
+      {% elif quiz.level == "Medium" %}
+      <span class="badge text-bg-warning">{{quiz.level}}</span>
+      {% else %}
+      <span class="badge text-bg-danger">{{quiz.level}}</span>
+      {% endif %}
+  </p>
+  <p>To pass the test you should answer correctly at least <strong>80%</strong> of the questions. You will have <strong><i class="bi bi-clock"></i> {{time_limit}}</strong> to answer all of them.</p>
+  
+  <div id="cridentials" style="border: 2px solid #dee2e6; border-radius: 10px; width: 30%; padding: 10px">
+    <div class="mb-3">
+      <label for="username" class="form-label">Username*</label>
+      <input type="text" class="form-control" id="username" placeholder="username">
+    </div>
+    <div class="mb-3">
+      <label for="email" class="form-label">Email address*</label>
+      <input type="email" class="form-control" id="email" placeholder="name@example.com">
+    </div>
+  </div>
+
+  <div class="form-group mt-3">
+    <button onclick="startQuizAnonym()" class="btn btn-outline-success">Start</button>
+    <button onclick="window.history.back()" class="btn btn-secondary">Close</button>
+  </div>
+</div>
+
+<script>
+  const username = document.getElementById('username');
+  const email = document.getElementById('email');
+
+  function startQuizAnonym() {
+    if (username.value == "") {
+      alert("Please enter a username.");
+      return;
+    }
+    if (email.value == "") {
+      alert("Please enter an email.");
+      return;
+    }
+    const newURL = "{% url 'run_quiz' quiz.pk %}?username=" + username.value + "&email=" + email.value;
+    window.location.href = newURL;
+  }
+</script>
+
+{% endblock %}

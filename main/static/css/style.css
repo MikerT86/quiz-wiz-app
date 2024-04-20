@@ -1,0 +1,177 @@
+
+body {
+    background-color: rgb(240, 240, 240);
+    padding-top: 56px;
+    overflow-y: hidden;
+  }
+
+.content {
+    position: absolute; 
+    top: 26px; /* Height of the navbar */
+    bottom: 0;
+    left: 0;
+    right: 0;
+    overflow-y: auto; /* Enable vertical scrollbar for content */
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+/* width */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 5px grey;
+}
+ 
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: gray;
+  border-radius: 5px; 
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555; 
+}
+
+.custom-card {
+  font-size: 16px; 
+  font-family: 'Nunito Sans', sans-serif;
+}
+
+.custom-card:hover {
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2), 0 3px 10px 0 rgba(0, 0, 0, 0.19); 
+  cursor: pointer;
+}
+
+.custom-card-header {
+  font-size: 16px; 
+  font-family: sans-serif;
+  display: flex;
+  background-color: rgba(215, 215, 215, 0.862);
+  padding: 7px 15px;
+}
+
+.custom-card .card-footer {
+  background-color: rgba(215, 215, 215, 0.862);
+}
+
+input[type="radio"] {
+  border: 2px solid #ccc;
+  border-radius: 4px; /* Square corners for checkbox-like look */
+}
+
+.chart-heading {
+  font-size: 24px; 
+  font-family: 'Rubik', sans-serif;
+  color: #000000;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.chart-container {
+  width: 150px;
+}
+
+.timer {
+  font-size: 3em;
+  font-weight: bold;
+  color: black;
+}
+.red-timer {
+  color: red;
+}
+
+.loader {
+  width: 50px;
+  aspect-ratio: 1;
+  display: grid;
+  border: 4px solid #0000;
+  border-radius: 50%;
+  border-color: #ccc #0000;
+  animation: l16 1s infinite linear;
+  position: fixed;  /* Ensures element stays in center of viewport */
+  top: 50%;
+  left: 50%;
+  }
+  .loader::before,
+  .loader::after {    
+  content: "";
+  grid-area: 1/1;
+  margin: 2px;
+  border: inherit;
+  border-radius: 50%;
+  }
+  .loader::before {
+  border-color: #72f033 #0000;
+  animation: inherit; 
+  animation-duration: .5s;
+  animation-direction: reverse;
+  }
+  .loader::after {
+  margin: 8px;
+  }
+  @keyframes l16 { 
+  100%{transform: rotate(1turn)}
+  }
+
+.card:hover {
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2), 0 3px 10px 0 rgba(0, 0, 0, 0.19); 
+  cursor: pointer;
+}
+
+.custom-footer {
+    background-color: rgb(240, 240, 240);
+  }
+
+#overlay {
+  position: fixed;  /* Ensures overlay stays on top */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);  /* Semi-transparent background */
+  display: flex;
+  justify-content: center;
+  align-items: center;  /* Center the animation content */
+  z-index: 10;  /* Ensure overlay appears above form elements */
+}
+
+/* HTML: <div class="loader"></div> */
+  .loader {
+  width: 50px;
+  aspect-ratio: 1;
+  display: grid;
+  border: 4px solid #0000;
+  border-radius: 50%;
+  border-color: #ccc #0000;
+  animation: l16 1s infinite linear;
+  position: fixed;  /* Ensures element stays in center of viewport */
+  top: 40%;
+  left: 50%;
+  }
+  .loader::before,
+  .loader::after {    
+  content: "";
+  grid-area: 1/1;
+  margin: 2px;
+  border: inherit;
+  border-radius: 50%;
+  }
+  .loader::before {
+  border-color: #72f033 #0000;
+  animation: inherit; 
+  animation-duration: .5s;
+  animation-direction: reverse;
+  }
+  .loader::after {
+  margin: 8px;
+  }
+  @keyframes l16 { 
+  100%{transform: rotate(1turn)}
+  }
