@@ -124,7 +124,7 @@ class Quiz(models.Model):
         try:
             return Results.objects.get(user=user, quiz=self)
         except Results.DoesNotExist:
-            return Results.objects.create(user=user, quiz=self)
+            return Results.objects.create(user=user, quiz=self, total_questions=self.get_number_questions())
     
 class Results(models.Model):
 
