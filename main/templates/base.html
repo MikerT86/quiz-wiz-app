@@ -96,32 +96,18 @@
           }
 
         $('#generate').click(async function() {
-
-            if (document.getElementById('topic').value == "") {
-                    alert("Please enter a topic.");
-                    return;
-                }
-            
-                if (document.getElementById('description').value == "") {
-                    alert("Please enter a description.");
-                    return;
-                }
     
-            const numQuestions = parseInt(prompt("Enter number of questions (<= 10):"));
+            const numQuestions = parseInt(document.querySelector('input[name="numQuestions"]:checked').value);
             const csrftoken = document.getElementById('quizForm').querySelector('[name=csrfmiddlewaretoken]').value;
             const toast = bootstrap.Toast.getOrCreateInstance(toastLive)
-
-            if (!Number.isInteger(numQuestions) || numQuestions <= 0 || numQuestions > 10) {
-                alert("You entered an invalid number of questions.");
-                return;
-            }
+            const openAIKey = document.getElementById('openaikey').value;
             
             var params = {
                 'numQuestions': numQuestions,
                 'topic': document.getElementById('topic').value,
                 'description': document.getElementById('description').value,
                 'level': document.querySelector('input[name="level"]:checked').value,
-                'useAI': quizForm.elements['useAI'].checked,
+                'openAIKey': openAIKey,
             };
     
             console.log(params);

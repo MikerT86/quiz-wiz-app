@@ -28,11 +28,7 @@
         {% endfor %}
       </div>  
       <div class="form-group ms-3 d-flex align-items-center">
-        <div class="form-check form-switch" style="margin-top: 1px" {% if not user.extendeduser.openai_key %} hidden {% endif %}>
-          <input class="form-check-input" type="checkbox" role="switch" id="useAI">
-          <label class="form-check-label fw-bold" for="useAI" style="margin-right: 5px">Use AI</label>
-        </div>
-        <button type="button" class="btn btn-primary btn-sm" style="font-weight: bold; margin-right: 4px" id="generate">Generate Questions <i class="bi bi-magic"></i></button>
+        <button type="button" class="btn btn-primary btn-sm" style="font-weight: bold; margin-right: 4px" id="generate_" onclick='validateForm()'>Generate Questions <i class="bi bi-magic"></i></button>
         <button type="button" class="btn btn-primary btn-sm" style="font-weight: bold" id="get_prompt">Prompt <i class="bi bi-chat"></i></button>
       </div>
     </div>
@@ -83,6 +79,48 @@
       </div>  
     </div>
 
+    <!-- Modal -->
+    <div class="modal fade" id="questionsModal" tabindex="-1" aria-labelledby="questionsModalLabel" aria-hidden="true">
+      <div class="modal-dialog" style="max-width: 70%;">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="equestionsModalLabel">Generate Questions</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            How many questions do you want to generate?
+            <div class="btn-toolbar" role="toolbar">
+            {% for i in questions_range %}
+            <input type="radio" class="btn-check" name="numQuestions" id="option{{i}}" autocomplete="off" {% if i == 1 %}checked{% endif %} value="{{i}}">
+            <label class="btn" for="option{{i}}">{{i}}</label>
+            {% endfor %}
+            </div>
+            <hr>
+            <div class="form-check mt-2">
+              <input class="form-check-input" type="radio" name="gen_mode" id="llm" value="llm" onchange="genMode()">
+              <label class="form-check-label" for="llm">
+                Use GPT to generate questions
+              </label>
+            </div>
+            <div class="input-group mt-2">
+              <span class="input-group-text"><strong>OpenAI Key</strong></span>
+              <input type="text" class="form-control" placeholder="sk-..." id="openaikey" aria-describedby="openaikey" disabled>
+            </div> 
+            <div class="form-check mt-2">
+              <input class="form-check-input" type="radio" name="gen_mode" id="template" value="template" onchange="genMode()" checked>
+              <label class="form-check-label" for="template">
+                Generate default template
+              </label>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary btn-sm" data-bs-dismiss="modal" id="generate">Go</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="form-group mt-3">
       <button type="submit" class="btn btn-success btn-sm" id="saveQuiz">Save</button>
       <a href="/" class="btn btn-secondary btn-sm">Close</a>
@@ -110,6 +148,14 @@ function sendRequestToServer(url, method, formData) {
   });
 }
 
+function genMode() {
+  if (document.getElementById('llm').checked) {
+    document.getElementById('openaikey').disabled = false;
+  } else {
+    document.getElementById('openaikey').disabled = true;
+  }
+}
+
 function getQuizParams() {
   const numQuestions = parseInt(prompt("Enter number of questions (<= 10):"));
   if (!Number.isInteger(numQuestions) || numQuestions <= 0 || numQuestions > 10) {
@@ -129,13 +175,13 @@ function getQuizParams() {
 // Add event listener to the form
 $('#get_prompt').click(function() {
 
-  if (document.getElementById('topic').value == "") {
-    alert("Please enter a topic.");
+  if (!topic.checkValidity()) {
+    topic.reportValidity();
     return;
   }
 
-  if (document.getElementById('description').value == "") {
-    alert("Please enter a description.");
+  if (!description.checkValidity()) {
+    description.reportValidity();
     return;
   }
 
@@ -146,6 +192,24 @@ $('#get_prompt').click(function() {
 
 <script>
 const form = document.getElementById('quizForm');
+const topic = document.getElementById('topic');
+const description = document.getElementById('description');
+const questionsModal = new bootstrap.Modal(document.getElementById('questionsModal'));
+
+function validateForm() {
+
+    if (!topic.checkValidity()) {
+      topic.reportValidity();
+      return false;
+    }
+
+    if (!description.checkValidity()) {
+      description.reportValidity();
+      return false;
+    }
+
+    questionsModal.show();
+}
 
 form.addEventListener('submit', (event) => {
     const json_questions = document.getElementById('questions').value;

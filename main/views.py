@@ -65,7 +65,7 @@ def create_quiz(request):
     else:
         form = QuizForm()
 
-    return render(request, 'create_quiz.html', {'form': form, 'quiz': None})
+    return render(request, 'create_quiz.html', {'form': form, 'quiz': None, 'questions_range': range(1, 11)})
 
 
 def run_quiz(request, pk):

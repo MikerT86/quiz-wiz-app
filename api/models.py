@@ -63,7 +63,7 @@ class QGenerator:
         
     def generate_questions(self, data):
 
-        if not data['useAI']:
+        if not self.open_ai_key:
             answer = self.template(data)
         else:
             prompt = self.prompt(data)
