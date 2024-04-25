@@ -131,7 +131,7 @@ def update_quiz(request, pk):
     else:
         form = QuizForm(instance=quiz, initial={'questions_as_json': quiz.questions_to_string()})
 
-    return render(request, 'create_quiz.html', {'form': form, 'quiz': quiz})
+    return render(request, 'create_quiz.html', {'form': form, 'quiz': quiz, 'questions_range': range(1, 11)})
 
 def view_quiz(request, pk):
     
