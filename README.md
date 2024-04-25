@@ -11,6 +11,6 @@
 
 ## Deployment
 In order to run application in [Docker](docker.com) execute in terminal:
-1. ```git clone https://github.com/MikerT86/quiz-ai-app.git```
+1. ```git clone https://github.com/MikerT86/quiz-wiz-app.git```
 2. ```cd quiz-ai-app```
 4. ```docker-compose up -d```
