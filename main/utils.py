@@ -1,4 +1,6 @@
 from django.core.mail import send_mail
+from django.db import models
+from .models import Quiz, Results
 
 def send_results_email(results, name, email, quiz):
     subject = f"Quiz Results: {quiz.topic}_{quiz.description}"
@@ -21,3 +23,20 @@ def send_results_email(results, name, email, quiz):
         'example@gmail.com',  # Replace with your email address
         [email],  # Recipient email
     )
+    
+def collect_statistics(results, quiz_list):
+        
+        statistics = {
+            'total_quizzes': len(quiz_list),
+            'total_results': len(results),
+            'total_hard': len(quiz_list.filter(level="Hard")),
+            'total_medium': len(quiz_list.filter(level="Medium")),
+            'total_easy': len(quiz_list.filter(level="Easy")),
+            'total_passed': len(results),
+            'passed_hard': len(results.filter(quiz__level="Hard")),
+            'passed_medium': len(results.filter(quiz__level="Medium")),
+            'passed_easy': len(results.filter(quiz__level="Easy")),
+            'average_score': (100 * results.aggregate(models.Sum('questions_answered'))['questions_answered__sum'] / results.aggregate(models.Sum('total_questions'))['total_questions__sum']).__round__(2) if len(results) > 0 else 0,          
+        }
+        
+        return statistics

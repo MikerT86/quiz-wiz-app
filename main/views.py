@@ -8,6 +8,7 @@ from django.db import transaction
 
 from .forms import RegistrationForm, QuizForm
 from .models import Quiz, Results
+from .utils import collect_statistics
 
 @login_required(login_url="/login")
 def home(request):
@@ -20,7 +21,7 @@ def home(request):
         else:
             quiz.passed = -1
     
-    return render(request, 'home.html', {"quiz_list": quiz_list, "statistics": request.user.extendeduser.statistics()})
+    return render(request, 'home.html', {"quiz_list": quiz_list, "statistics": collect_statistics(results, quiz_list)})
 
 
 def sing_up(request):
@@ -51,7 +52,7 @@ def create_quiz(request):
             questions = json.loads(form.cleaned_data['questions_as_json'])['data']
             with transaction.atomic():
                 quiz = Quiz.objects.create(
-                        author=request.user.extendeduser,
+                        author=request.user,
                         topic=form.cleaned_data['topic'],
                         level=form.cleaned_data['level'],
                         description=form.cleaned_data['description'],
@@ -80,7 +81,7 @@ def run_quiz(request, pk):
             results, score = Results.get_results_anonymous(quiz, request.POST)
             return render(request, 'results.html', {'results': results, 'percent_correct': score})
         else:
-            results = quiz.get_results(request.user.extendeduser)
+            results = quiz.get_results(request.user)
             results.update(request.POST)
             results.save()
             return redirect(f'/results/{quiz.id}')
@@ -93,10 +94,10 @@ def run_quiz(request, pk):
 def results(request, pk):
     
     try:
-        results = Results.objects.get(user=request.user.extendeduser, quiz=Quiz.objects.get(pk=pk))
+        results = Results.objects.get(user=request.user, quiz=Quiz.objects.get(pk=pk))
         return render(request, 'results.html', {'results': results, 'percent_correct': results.percent_correct()})
     except Results.DoesNotExist:
-        messages.info(request, f"Results of the quiz: {request.GET['quiz_id']} for User {request.user.extendeduser} not found")
+        messages.info(request, f"Results of the quiz: {request.GET['quiz_id']} for User {request.user} not found")
         return redirect('/')
     
 @login_required(login_url="/login")
@@ -117,7 +118,7 @@ def update_quiz(request, pk):
         if form.is_valid():
             
             with transaction.atomic():
-                quiz.author = request.user.extendeduser
+                quiz.author = request.user
                 if quiz.questions_to_string() != form.cleaned_data['questions_as_json']:
                     for question in quiz.questions.all(): 
                         question.delete()

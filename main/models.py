@@ -2,30 +2,6 @@ import json
 
 from django.db import models
 from django.contrib.auth.models import User
-
-class ExtendedUser(User):
-    # user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
-    openai_key = models.CharField(max_length=255, blank=True)
-    
-    def statistics(self):
-        
-        results = Results.objects.filter(user=self)
-        quiz_list = Quiz.objects.filter(author=self)
-        
-        statistics = {
-            'total_quizzes': len(quiz_list),
-            'total_results': len(results),
-            'total_hard': len(quiz_list.filter(level="Hard")),
-            'total_medium': len(quiz_list.filter(level="Medium")),
-            'total_easy': len(quiz_list.filter(level="Easy")),
-            'total_passed': len(results),
-            'passed_hard': len(results.filter(quiz__level="Hard")),
-            'passed_medium': len(results.filter(quiz__level="Medium")),
-            'passed_easy': len(results.filter(quiz__level="Easy")),
-            'average_score': (100 * results.aggregate(models.Sum('questions_answered'))['questions_answered__sum'] / results.aggregate(models.Sum('total_questions'))['total_questions__sum']).__round__(2) if len(results) > 0 else 0,          
-        }
-        
-        return statistics
     
     
 class Option(models.Model):
@@ -63,7 +39,7 @@ class Quiz(models.Model):
 
     LEVEL_CHOICES = [("Easy", "Easy"), ("Medium", "Medium"), ("Hard", "Hard")]
 
-    author = models.ForeignKey(ExtendedUser, on_delete=models.CASCADE, default=ExtendedUser)
+    author = models.ForeignKey(User, on_delete=models.CASCADE, default=User)
     topic = models.CharField(max_length=100, default="")
     level = models.CharField(max_length=20, choices=LEVEL_CHOICES, default="Easy")
     description = models.TextField(default="General knowledge", max_length=200)
@@ -128,7 +104,7 @@ class Quiz(models.Model):
     
 class Results(models.Model):
 
-    user = models.ForeignKey(ExtendedUser, on_delete=models.CASCADE, default=ExtendedUser)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, default=User)
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, default=Quiz)
     total_questions = models.IntegerField(default=0)
     questions_answered = models.IntegerField(default=0)

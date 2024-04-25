@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from .models import Quiz, Results, ExtendedUser
+from django.contrib.auth.models import User
+from .models import Quiz, Results
 
 QUESTIONS_TEMPLATE = '''{
     "data": [
@@ -19,11 +20,10 @@ QUESTIONS_TEMPLATE = '''{
     
 class RegistrationForm(UserCreationForm):
     email = forms.EmailField(required=True)
-    openai_key = forms.CharField(max_length=100, required=False, label="OpenAI API key")
     
     class Meta:
-        model = ExtendedUser
-        fields = ("username", "email", "openai_key", "password1", "password2")
+        model = User
+        fields = ("username", "email", "password1", "password2")
 
 
 class QuizForm(forms.ModelForm):
