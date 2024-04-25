@@ -3,7 +3,7 @@
 ## Fully responsive application for quiz generation. 
 
 ## Functionality
-1. You can generate quiz manually or using LLM (GPR)
+1. You can generate quiz manually or using LLM (OpenAI API key required)
 2. You can take quizzes.
 3. You can see the results and statistics.
 4. You can share the quiz.
