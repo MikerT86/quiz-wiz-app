@@ -12,17 +12,21 @@
 
 ## Deployment
 In order to run application in [Docker](docker.com) execute in terminal:
-1. ```git clone https://github.com/MikerT86/quiz-wiz-app.git```
-2. ```cd quiz-ai-app```
-4. ```docker-compose up -d```
+```shell
+git clone https://github.com/MikerT86/quiz-wiz-app.git
+cd quiz-ai-app
+docker-compose up -d
+```
 
 Run application locally (MacOS/Linux). Python version 3.12:
-1. ```git clone https://github.com/MikerT86/quiz-wiz-app.git```
-2. ```cd quiz-wiz-app```
-3. ```python -m venv env```
-4. ```source env/bin/activate```
-5. ```pip install -r requirements.py```
-6. ```python manage.py collectstatic```
-7. ```python manage makemigrations```
-8. ```python manage migrate```
-9. ```gunicorn app.wsgi --bind 127.0.0.1:8000```
+```shell
+git clone https://github.com/MikerT86/quiz-wiz-app.git
+cd quiz-wiz-app
+python -m venv env
+source env/bin/activate
+pip install -r requirements.py
+python manage.py collectstatic
+python manage makemigrations
+python manage migrate
+gunicorn app.wsgi --bind 127.0.0.1:8000
+```
