@@ -16,11 +16,11 @@ def home(request):
     results = Results.objects.filter(user=request.user)
     
     for quiz in quiz_list:
-        if results.filter(quiz=quiz).exists():
+        try:
             quiz.passed = results.get(quiz=quiz).passed
-        else:
+        except Results.DoesNotExist:
             quiz.passed = -1
-    
+            
     return render(request, 'home.html', {"quiz_list": quiz_list, "statistics": collect_statistics(results, quiz_list)})
 
 
