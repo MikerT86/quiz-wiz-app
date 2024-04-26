@@ -18,10 +18,11 @@ In order to run application in [Docker](docker.com) execute in terminal:
 
 Run application locally (MacOS/Linux). Python version 3.12:
 1. ```git clone https://github.com/MikerT86/quiz-wiz-app.git```
-2. ```cd quiz-ai-app```
+2. ```cd quiz-wiz-app```
 3. ```python -m venv env```
 4. ```source env/bin/activate```
-5. ```python manage.py collectstatic```
-6. ```python manage makemigrations```
-7. ```python manage migrate```
-8. ```gunicorn app.wsgi --bind 127.0.0.1:8000```
+5. ```pip install -r requirements.py```
+6. ```python manage.py collectstatic```
+7. ```python manage makemigrations```
+8. ```python manage migrate```
+9. ```gunicorn app.wsgi --bind 127.0.0.1:8000```
