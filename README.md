@@ -14,7 +14,7 @@
 In order to run application in [Docker](docker.com) execute in terminal:
 ```shell
 git clone https://github.com/MikerT86/quiz-wiz-app.git
-cd quiz-ai-app
+cd quiz-wiz-app
 docker-compose up -d
 ```
 
